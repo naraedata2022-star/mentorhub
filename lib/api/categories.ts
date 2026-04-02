@@ -12,13 +12,11 @@ import type { Category } from "@/types/category";
  */
 export async function getCategories() {
   const supabase = createClient();
-  return supabase
+  const { data, error } = await supabase
     .from("categories")
     .select("*")
-    .order("sort_order", { ascending: true }) as Promise<{
-    data: Category[] | null;
-    error: { message: string; details: string; hint: string; code: string } | null;
-  }>;
+    .order("sort_order", { ascending: true });
+  return { data: data as Category[] | null, error };
 }
 
 /**
@@ -29,12 +27,10 @@ export async function getCategories() {
  */
 export async function getCategoryById(id: string) {
   const supabase = createClient();
-  return supabase
+  const { data, error } = await supabase
     .from("categories")
     .select("*")
     .eq("id", id)
-    .single() as Promise<{
-    data: Category | null;
-    error: { message: string; details: string; hint: string; code: string } | null;
-  }>;
+    .single();
+  return { data: data as Category | null, error };
 }

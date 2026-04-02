@@ -1,10 +1,11 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
-import { getProfile, updateProfile, type UpdateProfileData } from '@/lib/api/users'
+import { getProfile, updateProfile } from '@/lib/api/users'
+import type { UserProfile, UpdateProfileData } from '@/types/user'
 
 export function useProfile(userId?: string) {
-  const [profile, setProfile] = useState<Record<string, unknown> | null>(null)
+  const [profile, setProfile] = useState<UserProfile | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 

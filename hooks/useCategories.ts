@@ -13,8 +13,13 @@ export function useCategories() {
     setIsLoading(true)
     setError(null)
     try {
-      const data = await getCategories()
-      setCategories(data)
+      const { data, error: err } = await getCategories()
+      if (err) {
+        setError(err.message)
+        setCategories([])
+      } else {
+        setCategories(data ?? [])
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error')
     } finally {

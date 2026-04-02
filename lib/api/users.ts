@@ -17,14 +17,12 @@ import type {
  */
 export async function getProfile(userId: string) {
   const supabase = createClient();
-  return supabase
+  const { data, error } = await supabase
     .from("users")
     .select("*")
     .eq("id", userId)
-    .single() as Promise<{
-    data: UserProfile | null;
-    error: { message: string; details: string; hint: string; code: string } | null;
-  }>;
+    .single();
+  return { data: data as UserProfile | null, error };
 }
 
 /**
@@ -37,15 +35,13 @@ export async function getProfile(userId: string) {
  */
 export async function updateProfile(userId: string, data: UpdateProfileData) {
   const supabase = createClient();
-  return supabase
+  const { data: result, error } = await supabase
     .from("users")
     .update(data)
     .eq("id", userId)
     .select("*")
-    .single() as Promise<{
-    data: UserProfile | null;
-    error: { message: string; details: string; hint: string; code: string } | null;
-  }>;
+    .single();
+  return { data: result as UserProfile | null, error };
 }
 
 /**
@@ -58,17 +54,15 @@ export async function updateProfile(userId: string, data: UpdateProfileData) {
  */
 export async function createProfile(userId: string, data: CreateProfileData) {
   const supabase = createClient();
-  return supabase
+  const { data: result, error } = await supabase
     .from("users")
     .insert({
       id: userId,
       ...data,
     })
     .select("*")
-    .single() as Promise<{
-    data: UserProfile | null;
-    error: { message: string; details: string; hint: string; code: string } | null;
-  }>;
+    .single();
+  return { data: result as UserProfile | null, error };
 }
 
 /**
