@@ -1,0 +1,50 @@
+version: "2.0"
+
+screen:
+  name: 로그인
+  route: /login
+  layout: full-width
+  auth: false
+
+data_requirements: []
+
+components:
+  - id: login_form
+    type: form
+    position: main
+    function: 소셜 로그인 및 이메일 로그인 폼
+    events:
+      - on: click:social_login
+        do: Google/Kakao OAuth 인증 시작
+      - on: submit
+        do: 이메일/비밀번호로 로그인
+
+  - id: signup_link
+    type: button
+    position: main
+    function: 회원가입 페이지로 이동
+    events:
+      - on: click
+        do: /signup으로 이동
+
+connections:
+  navigations:
+    - from: login_form
+      to: /
+    - from: login_form
+      to: /onboarding
+    - from: signup_link
+      to: /signup
+
+tests:
+  - name: 소셜 로그인
+    when: Google 로그인 버튼 클릭
+    then: [Google OAuth 팝업 표시, 인증 성공 시 홈으로 이동]
+
+  - name: 이메일 로그인
+    when: 이메일/비밀번호 입력 후 로그인 클릭
+    then: [인증 성공 시 홈으로 이동, 실패 시 에러 메시지 표시]
+
+  - name: 회원가입 이동
+    when: 회원가입 링크 클릭
+    then: [/signup으로 이동]

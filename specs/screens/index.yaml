@@ -1,0 +1,91 @@
+# MentorHub 화면 인덱스
+version: "2.0"
+
+screens:
+  # 인증
+  - id: login
+    name: 로그인
+    route: /login
+    file: login.yaml
+    auth: false
+
+  - id: signup
+    name: 회원가입
+    route: /signup
+    file: signup.yaml
+    auth: false
+
+  - id: onboarding
+    name: 온보딩
+    route: /onboarding
+    file: onboarding.yaml
+    auth: true
+
+  # 메인 (탭)
+  - id: home
+    name: 홈
+    route: /
+    file: home.yaml
+    auth: false
+    tab: true
+
+  - id: search
+    name: 검색
+    route: /search
+    file: search.yaml
+    auth: false
+    tab: true
+
+  - id: matching
+    name: 매칭
+    route: /matching
+    file: matching.yaml
+    auth: true
+    tab: true
+
+  - id: chat-list
+    name: 채팅 목록
+    route: /chat
+    file: chat-list.yaml
+    auth: true
+    tab: true
+
+  - id: profile
+    name: 프로필
+    route: /profile
+    file: profile.yaml
+    auth: true
+    tab: true
+
+  # 상세
+  - id: category-detail
+    name: 카테고리 상세
+    route: /category/:id
+    file: category-detail.yaml
+    auth: false
+
+  - id: mentoring-detail
+    name: 멘토링 상세
+    route: /mentoring/:id
+    file: mentoring-detail.yaml
+    auth: false
+
+  - id: chat-detail
+    name: 채팅 상세
+    route: /chat/:id
+    file: chat-detail.yaml
+    auth: true
+
+  - id: profile-edit
+    name: 프로필 편집
+    route: /profile/edit
+    file: profile-edit.yaml
+    auth: true
+
+navigation:
+  tabs:
+    - { icon: Home, label: 홈, route: / }
+    - { icon: Search, label: 검색, route: /search }
+    - { icon: Sparkles, label: 매칭, route: /matching }
+    - { icon: MessageCircle, label: 채팅, route: /chat }
+    - { icon: User, label: 프로필, route: /profile }

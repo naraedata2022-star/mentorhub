@@ -1,0 +1,69 @@
+version: "2.0"
+
+screen:
+  name: 멘토링 상세
+  route: /mentoring/:id
+  layout: full-width
+  auth: false
+
+data_requirements:
+  - resource: mentoring_sessions
+    needs: [id, title, description, location, schedule, status, mentor_id, category_id]
+
+  - resource: users
+    needs: [id, name, avatar_url, bio, region]
+
+  - resource: user_skills
+    needs: [id, title, description, category_id]
+    filters: { user_id: "mentor_id" }
+
+components:
+  - id: mentor_profile_card
+    type: card
+    position: main
+    function: 멘토 프로필 (이름, 사진, 자기소개, 지역)
+    data_source:
+      resource: users
+
+  - id: skills_section
+    type: list
+    position: main
+    function: 멘토가 가르칠 수 있는 것 목록
+    data_source:
+      resource: user_skills
+
+  - id: session_info
+    type: detail
+    position: main
+    function: 멘토링 정보 (시간, 장소, 내용)
+    data_source:
+      resource: mentoring_sessions
+
+  - id: apply_button
+    type: button
+    position: main
+    function: 멘토링 신청 버튼 (로그인 필요)
+    events:
+      - on: click
+        do: 로그인 확인 후 멘토링 신청, 채팅방 생성, /chat/:id로 이동
+
+connections:
+  navigations:
+    - from: apply_button
+      to: /chat/:id
+
+  external:
+    - auth
+
+tests:
+  - name: 멘토링 정보 표시
+    when: /mentoring/123 접속
+    then: [멘토 프로필 표시, 스킬 목록 표시, 멘토링 정보 표시]
+
+  - name: 멘토링 신청 (로그인)
+    when: 로그인 상태에서 신청 클릭
+    then: [신청 생성, 채팅방 생성, /chat/:id로 이동]
+
+  - name: 멘토링 신청 (비로그인)
+    when: 비로그인 상태에서 신청 클릭
+    then: [로그인 모달 표시]

@@ -1,0 +1,48 @@
+version: "2.0"
+
+screen:
+  name: 회원가입
+  route: /signup
+  layout: full-width
+  auth: false
+
+data_requirements: []
+
+components:
+  - id: signup_form
+    type: form
+    position: main
+    function: 이메일 회원가입 폼 (이메일, 비밀번호, 이름)
+    events:
+      - on: submit
+        do: 회원가입 처리 후 온보딩으로 이동
+      - on: click:social_signup
+        do: Google/Kakao OAuth 회원가입
+
+  - id: login_link
+    type: button
+    position: main
+    function: 로그인 페이지로 이동
+    events:
+      - on: click
+        do: /login으로 이동
+
+connections:
+  navigations:
+    - from: signup_form
+      to: /onboarding
+    - from: login_link
+      to: /login
+
+tests:
+  - name: 회원가입 성공
+    when: 유효한 정보 입력 후 가입 클릭
+    then: [계정 생성, /onboarding으로 이동]
+
+  - name: 유효성 검사 실패
+    when: 잘못된 이메일 형식 입력
+    then: [에러 메시지 표시, 폼 제출 방지]
+
+  - name: 중복 이메일
+    when: 이미 가입된 이메일로 가입 시도
+    then: [이미 가입된 이메일 에러 표시]

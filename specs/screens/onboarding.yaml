@@ -1,0 +1,80 @@
+version: "2.0"
+
+screen:
+  name: 온보딩
+  route: /onboarding
+  layout: full-width
+  auth: true
+
+data_requirements:
+  - resource: categories
+    needs: [id, name, icon]
+
+components:
+  - id: step_indicator
+    type: stepper
+    position: main
+    function: 온보딩 3단계 진행 표시 (관심사 → 가르칠 것 → 배울 것)
+    events:
+      - on: click:step
+        do: 해당 단계로 이동 (완료된 단계만)
+
+  - id: category_selector
+    type: grid
+    position: main
+    function: 관심사 카테고리 복수 선택 그리드
+    data_source:
+      resource: categories
+    events:
+      - on: click:category
+        do: 카테고리 선택/해제 토글
+
+  - id: skills_form
+    type: form
+    position: main
+    function: "가르칠 수 있는 것" 입력 폼 (카테고리 + 제목 + 설명)
+    events:
+      - on: submit
+        do: 스킬 저장 후 다음 단계
+
+  - id: interests_form
+    type: form
+    position: main
+    function: "배우고 싶은 것" 입력 폼 (카테고리 + 제목 + 설명)
+    events:
+      - on: submit
+        do: 관심사 저장 후 다음 단계
+
+  - id: region_input
+    type: input
+    position: main
+    function: 지역 설정 입력
+    events:
+      - on: submit
+        do: 지역 저장
+
+  - id: complete_button
+    type: button
+    position: main
+    function: 온보딩 완료 후 홈으로 이동
+    events:
+      - on: click
+        do: 온보딩 완료 처리, /로 이동
+
+connections:
+  navigations:
+    - from: complete_button
+      to: /
+
+tests:
+  - name: 카테고리 선택
+    when: 관심사 카테고리 2개 이상 선택
+    then: [선택된 카테고리 하이라이트, 다음 버튼 활성화]
+
+  - name: 스킬 등록
+    when: "가르칠 수 있는 것" 입력 후 저장
+    then: [user_skills에 데이터 저장, 다음 단계로 이동]
+
+  - name: 온보딩 완료
+    when: 모든 단계 완료 후 시작 클릭
+    then: [홈 화면으로 이동, 프로필 정보 저장]

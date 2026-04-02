@@ -1,0 +1,73 @@
+version: "2.0"
+
+screen:
+  name: 채팅 상세
+  route: /chat/:id
+  layout: full-width
+  auth: true
+
+data_requirements:
+  - resource: messages
+    needs: [id, content, sender_id, is_read, created_at]
+    filters: { chat_room_id: ":id" }
+
+  - resource: users
+    needs: [id, name, avatar_url]
+
+  - resource: chat_participants
+    needs: [chat_room_id, user_id]
+
+components:
+  - id: chat_header
+    type: navigation
+    position: header
+    function: 상대방 이름, 프로필 링크, 뒤로가기
+    events:
+      - on: click:profile
+        do: 상대방 프로필 보기
+      - on: click:back
+        do: /chat으로 이동
+
+  - id: message_list
+    type: list
+    position: main
+    function: 메시지 목록 (말풍선 형태, 실시간 업데이트)
+    data_source:
+      resource: messages
+    events:
+      - on: scroll:top
+        do: 이전 메시지 로드
+
+  - id: message_input
+    type: form
+    position: footer
+    function: 메시지 입력 필드 + 전송 버튼
+    events:
+      - on: submit
+        do: 메시지 전송 (Supabase Realtime)
+
+connections:
+  navigations:
+    - from: chat_header
+      to: /chat
+
+  external:
+    - auth
+    - supabase_realtime
+
+tests:
+  - name: 메시지 로드
+    when: /chat/123 접속
+    then: [기존 메시지 표시, 스크롤 최하단 이동]
+
+  - name: 메시지 전송
+    when: 메시지 입력 후 전송 클릭
+    then: [메시지 화면에 추가, 상대방에게 실시간 전달]
+
+  - name: 실시간 수신
+    when: 상대방이 메시지 전송
+    then: [새 메시지 실시간 표시, 읽음 처리]
+
+  - name: 이전 메시지 로드
+    when: 위로 스크롤
+    then: [이전 메시지 추가 로드]

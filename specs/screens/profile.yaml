@@ -1,0 +1,99 @@
+version: "2.0"
+
+screen:
+  name: 프로필
+  route: /profile
+  layout: full-width
+  auth: true
+
+data_requirements:
+  - resource: users
+    needs: [id, name, avatar_url, bio, region]
+
+  - resource: user_skills
+    needs: [id, title, description, category_id]
+    filters: { user_id: "current_user" }
+
+  - resource: user_interests
+    needs: [id, title, description, category_id]
+    filters: { user_id: "current_user" }
+
+  - resource: mentoring_sessions
+    needs: [id, title, status, created_at]
+    filters: { mentor_id: "current_user" }
+
+components:
+  - id: profile_header
+    type: card
+    position: main
+    function: 프로필 이미지 + 이름 + 지역
+    data_source:
+      resource: users
+
+  - id: skills_tags
+    type: list
+    position: main
+    function: "가르칠 수 있는 것" 태그 목록
+    data_source:
+      resource: user_skills
+
+  - id: interests_tags
+    type: list
+    position: main
+    function: "배우고 싶은 것" 태그 목록
+    data_source:
+      resource: user_interests
+
+  - id: bio_section
+    type: text
+    position: main
+    function: 자기소개 표시
+
+  - id: mentoring_history
+    type: list
+    position: main
+    function: 멘토링 이력 목록
+    data_source:
+      resource: mentoring_sessions
+
+  - id: edit_button
+    type: button
+    position: main
+    function: 프로필 편집 버튼
+    events:
+      - on: click
+        do: /profile/edit로 이동
+
+  - id: settings_section
+    type: list
+    position: main
+    function: 설정 메뉴 (알림 설정, 로그아웃)
+    events:
+      - on: click:logout
+        do: 로그아웃 처리, /login으로 이동
+
+connections:
+  navigations:
+    - from: edit_button
+      to: /profile/edit
+    - from: settings_section
+      to: /login
+
+  shared_components:
+    - tab_bar
+
+  external:
+    - auth
+
+tests:
+  - name: 프로필 정보 표시
+    when: /profile 접속
+    then: [프로필 이미지, 이름, 스킬 태그, 관심사 태그 표시]
+
+  - name: 편집 이동
+    when: 편집 버튼 클릭
+    then: [/profile/edit로 이동]
+
+  - name: 로그아웃
+    when: 로그아웃 클릭
+    then: [세션 종료, /login으로 이동]

@@ -1,0 +1,76 @@
+version: "2.0"
+
+screen:
+  name: 매칭
+  route: /matching
+  layout: full-width
+  auth: true
+
+data_requirements:
+  - resource: matches
+    needs: [id, user_a_id, user_b_id, score, status]
+    filters: { status: "pending" }
+
+  - resource: users
+    needs: [id, name, avatar_url, bio, region]
+
+  - resource: user_skills
+    needs: [id, title, category_id]
+
+  - resource: user_interests
+    needs: [id, title, category_id]
+
+components:
+  - id: recommended_list
+    type: list
+    position: main
+    function: AI 추천 멘토 카드 목록 (매칭 점수 표시)
+    data_source:
+      resource: matches
+    events:
+      - on: click:card
+        do: /mentoring/:id로 이동
+
+  - id: match_actions
+    type: button
+    position: main
+    function: 매칭 수락/거절 버튼
+    events:
+      - on: click:accept
+        do: 매칭 수락, 채팅방 생성
+      - on: click:dismiss
+        do: 매칭 거절
+
+  - id: empty_state
+    type: text
+    position: main
+    function: 매칭 결과 없을 때 안내 ("아직 매칭 결과가 없어요")
+    events:
+      - on: click:add_interests
+        do: /profile/edit로 이동
+
+connections:
+  navigations:
+    - from: recommended_list
+      to: /mentoring/:id
+    - from: match_actions
+      to: /chat/:id
+
+  shared_components:
+    - tab_bar
+
+  external:
+    - auth
+
+tests:
+  - name: 추천 목록 표시
+    when: 매칭 결과가 있는 상태에서 접속
+    then: [추천 멘토 카드 목록 표시, 매칭 점수 표시]
+
+  - name: 매칭 수락
+    when: 추천 멘토 수락 클릭
+    then: [매칭 상태 변경, 채팅방 생성, 채팅으로 이동]
+
+  - name: 빈 상태
+    when: 매칭 결과가 없는 상태에서 접속
+    then: [빈 상태 안내 표시, 관심사 추가 유도]

@@ -1,0 +1,94 @@
+# MentorHub 도메인 리소스 정의
+version: "1.0"
+
+resources:
+  users:
+    fields:
+      id: { type: uuid, pk: true }
+      email: { type: string, unique: true }
+      name: { type: string }
+      avatar_url: { type: string, nullable: true }
+      bio: { type: string, nullable: true }
+      region: { type: string, nullable: true }
+      latitude: { type: number, nullable: true }
+      longitude: { type: number, nullable: true }
+      created_at: { type: datetime }
+      updated_at: { type: datetime }
+
+  categories:
+    fields:
+      id: { type: uuid, pk: true }
+      name: { type: string, unique: true }
+      icon: { type: string, nullable: true }
+      sort_order: { type: number }
+
+  user_skills:
+    description: "가르칠 수 있는 것"
+    fields:
+      id: { type: uuid, pk: true }
+      user_id: { type: uuid, fk: users.id }
+      category_id: { type: uuid, fk: categories.id }
+      title: { type: string }
+      description: { type: string, nullable: true }
+      created_at: { type: datetime }
+
+  user_interests:
+    description: "배우고 싶은 것"
+    fields:
+      id: { type: uuid, pk: true }
+      user_id: { type: uuid, fk: users.id }
+      category_id: { type: uuid, fk: categories.id }
+      title: { type: string }
+      description: { type: string, nullable: true }
+      created_at: { type: datetime }
+
+  mentoring_sessions:
+    fields:
+      id: { type: uuid, pk: true }
+      mentor_id: { type: uuid, fk: users.id }
+      category_id: { type: uuid, fk: categories.id }
+      title: { type: string }
+      description: { type: string, nullable: true }
+      location: { type: string, nullable: true }
+      schedule: { type: string, nullable: true }
+      status: { type: string, enum: [active, closed, completed] }
+      created_at: { type: datetime }
+      updated_at: { type: datetime }
+
+  session_applications:
+    fields:
+      id: { type: uuid, pk: true }
+      session_id: { type: uuid, fk: mentoring_sessions.id }
+      applicant_id: { type: uuid, fk: users.id }
+      status: { type: string, enum: [pending, accepted, rejected] }
+      created_at: { type: datetime }
+
+  matches:
+    fields:
+      id: { type: uuid, pk: true }
+      user_a_id: { type: uuid, fk: users.id }
+      user_b_id: { type: uuid, fk: users.id }
+      score: { type: number }
+      status: { type: string, enum: [pending, accepted, dismissed] }
+      created_at: { type: datetime }
+
+  chat_rooms:
+    fields:
+      id: { type: uuid, pk: true }
+      created_at: { type: datetime }
+
+  chat_participants:
+    fields:
+      id: { type: uuid, pk: true }
+      chat_room_id: { type: uuid, fk: chat_rooms.id }
+      user_id: { type: uuid, fk: users.id }
+      joined_at: { type: datetime }
+
+  messages:
+    fields:
+      id: { type: uuid, pk: true }
+      chat_room_id: { type: uuid, fk: chat_rooms.id }
+      sender_id: { type: uuid, fk: users.id }
+      content: { type: string }
+      is_read: { type: boolean }
+      created_at: { type: datetime }

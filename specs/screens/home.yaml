@@ -1,0 +1,102 @@
+version: "2.0"
+
+screen:
+  name: 홈
+  route: /
+  layout: full-width
+  auth: false
+
+data_requirements:
+  - resource: categories
+    needs: [id, name, icon]
+
+  - resource: mentoring_sessions
+    needs: [id, title, description, location, mentor_id]
+    filters: { status: "active" }
+
+  - resource: users
+    needs: [id, name, avatar_url, region]
+
+components:
+  - id: header
+    type: navigation
+    position: header
+    function: 로고, 알림 아이콘 표시
+    events:
+      - on: click:notification
+        do: 알림 목록 표시
+
+  - id: search_bar
+    type: search-form
+    position: main
+    function: 멘토/멘토링 간단 검색
+    events:
+      - on: click
+        do: /search로 이동
+
+  - id: category_scroll
+    type: carousel
+    position: main
+    function: 카테고리 가로 스크롤 목록
+    data_source:
+      resource: categories
+    events:
+      - on: click:category
+        do: /category/:id로 이동
+
+  - id: popular_section
+    type: list
+    position: main
+    function: 인기 멘토링 세션 표시
+    data_source:
+      resource: mentoring_sessions
+    events:
+      - on: click:card
+        do: /mentoring/:id로 이동
+
+  - id: recent_section
+    type: list
+    position: main
+    function: 최근 등록 멘토링 세션 표시
+    data_source:
+      resource: mentoring_sessions
+    events:
+      - on: click:card
+        do: /mentoring/:id로 이동
+
+  - id: tab_bar
+    type: navigation
+    position: footer
+    function: 하단 탭 네비게이션 (홈/검색/매칭/채팅/프로필)
+    events:
+      - on: click:tab
+        do: 해당 탭 화면으로 이동
+
+connections:
+  navigations:
+    - from: category_scroll
+      to: /category/:id
+    - from: popular_section
+      to: /mentoring/:id
+    - from: recent_section
+      to: /mentoring/:id
+
+  shared_components:
+    - tab_bar
+
+tests:
+  - name: 초기 로드
+    when: 페이지 접속
+    then: [카테고리 목록 표시, 인기 멘토링 표시, 최근 멘토링 표시]
+
+  - name: 카테고리 클릭
+    when: 음악 카테고리 클릭
+    then: [/category/:id로 이동]
+
+  - name: 멘토링 카드 클릭
+    when: 멘토링 카드 클릭
+    then: [/mentoring/:id로 이동]
+
+  - name: 비로그인 접근
+    when: 비로그인 상태로 접속
+    then: [카테고리 탐색 가능, 로그인 버튼 표시]

@@ -1,0 +1,67 @@
+version: "2.0"
+
+screen:
+  name: 카테고리 상세
+  route: /category/:id
+  layout: full-width
+  auth: false
+
+data_requirements:
+  - resource: categories
+    needs: [id, name, icon]
+
+  - resource: mentoring_sessions
+    needs: [id, title, description, location, schedule, mentor_id, category_id]
+    filters: { category_id: ":id", status: "active" }
+
+  - resource: users
+    needs: [id, name, avatar_url, region]
+
+components:
+  - id: category_header
+    type: text
+    position: main
+    function: 카테고리 이름과 아이콘 표시
+    data_source:
+      resource: categories
+
+  - id: filter_bar
+    type: filter-form
+    position: main
+    function: 지역, 정렬 필터링
+    events:
+      - on: change:filter
+        do: 필터 적용하여 멘토 목록 갱신
+
+  - id: mentor_list
+    type: list
+    position: main
+    function: 해당 카테고리 멘토 카드 목록 (이름, 스킬, 지역, 소개)
+    data_source:
+      resource: mentoring_sessions
+    events:
+      - on: click:card
+        do: /mentoring/:id로 이동
+      - on: scroll:end
+        do: 다음 페이지 로드
+
+connections:
+  navigations:
+    - from: mentor_list
+      to: /mentoring/:id
+
+  shared_components:
+    - tab_bar
+
+tests:
+  - name: 카테고리 멘토 표시
+    when: /category/music 접속
+    then: [음악 카테고리 멘토 목록 표시, 카테고리 헤더 표시]
+
+  - name: 필터링
+    when: 지역 필터 "강남구" 선택
+    then: [강남구 멘토만 표시]
+
+  - name: 멘토 상세 이동
+    when: 멘토 카드 클릭
+    then: [/mentoring/:id로 이동]

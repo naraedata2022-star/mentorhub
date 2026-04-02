@@ -1,0 +1,101 @@
+version: "2.0"
+
+screen:
+  name: 프로필 편집
+  route: /profile/edit
+  layout: full-width
+  auth: true
+
+data_requirements:
+  - resource: users
+    needs: [id, name, avatar_url, bio, region]
+
+  - resource: user_skills
+    needs: [id, title, description, category_id]
+    filters: { user_id: "current_user" }
+
+  - resource: user_interests
+    needs: [id, title, description, category_id]
+    filters: { user_id: "current_user" }
+
+  - resource: categories
+    needs: [id, name]
+
+components:
+  - id: avatar_upload
+    type: image
+    position: main
+    function: 프로필 이미지 변경 (Supabase Storage 업로드)
+    events:
+      - on: click
+        do: 이미지 선택 다이얼로그
+
+  - id: profile_form
+    type: form
+    position: main
+    function: 이름, 자기소개, 지역 수정 폼
+    data_source:
+      resource: users
+    events:
+      - on: submit
+        do: 프로필 정보 저장
+
+  - id: skills_editor
+    type: form
+    position: main
+    function: "가르칠 수 있는 것" 추가/삭제/수정
+    data_source:
+      resource: user_skills
+    events:
+      - on: click:add
+        do: 새 스킬 입력 폼 표시
+      - on: click:delete
+        do: 해당 스킬 삭제
+
+  - id: interests_editor
+    type: form
+    position: main
+    function: "배우고 싶은 것" 추가/삭제/수정
+    data_source:
+      resource: user_interests
+    events:
+      - on: click:add
+        do: 새 관심사 입력 폼 표시
+      - on: click:delete
+        do: 해당 관심사 삭제
+
+  - id: action_buttons
+    type: button
+    position: footer
+    function: 저장/취소 버튼
+    events:
+      - on: click:save
+        do: 모든 변경사항 저장, /profile로 이동
+      - on: click:cancel
+        do: 변경 취소, /profile로 이동
+
+connections:
+  navigations:
+    - from: action_buttons
+      to: /profile
+
+  external:
+    - auth
+    - supabase_storage
+
+tests:
+  - name: 기존 정보 로드
+    when: /profile/edit 접속
+    then: [기존 프로필 정보 폼에 채워짐]
+
+  - name: 프로필 저장
+    when: 정보 수정 후 저장 클릭
+    then: [변경사항 저장, /profile로 이동, 성공 토스트 표시]
+
+  - name: 스킬 추가
+    when: "가르칠 수 있는 것" 추가 클릭
+    then: [새 입력 폼 표시, 카테고리 선택 가능]
+
+  - name: 취소
+    when: 취소 클릭
+    then: [변경 미저장, /profile로 이동]

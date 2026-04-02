@@ -1,0 +1,70 @@
+# MentorHub 공통 타입
+version: "2.0"
+
+types:
+  User:
+    fields:
+      id: uuid
+      email: string
+      name: string
+      avatar_url: string | null
+      bio: string | null
+      region: string | null
+
+  Category:
+    fields:
+      id: uuid
+      name: string
+      icon: string | null
+
+  Skill:
+    description: "가르칠 수 있는 것"
+    fields:
+      id: uuid
+      user_id: uuid
+      category_id: uuid
+      title: string
+      description: string | null
+
+  Interest:
+    description: "배우고 싶은 것"
+    fields:
+      id: uuid
+      user_id: uuid
+      category_id: uuid
+      title: string
+      description: string | null
+
+  MentoringSession:
+    fields:
+      id: uuid
+      mentor_id: uuid
+      category_id: uuid
+      title: string
+      description: string | null
+      location: string | null
+      schedule: string | null
+      status: "active" | "closed" | "completed"
+
+  Match:
+    fields:
+      id: uuid
+      user_a_id: uuid
+      user_b_id: uuid
+      score: number
+      status: "pending" | "accepted" | "dismissed"
+
+  ChatRoom:
+    fields:
+      id: uuid
+      participants: User[]
+      last_message: Message | null
+
+  Message:
+    fields:
+      id: uuid
+      chat_room_id: uuid
+      sender_id: uuid
+      content: string
+      is_read: boolean
+      created_at: datetime

@@ -1,0 +1,60 @@
+version: "2.0"
+
+screen:
+  name: 채팅 목록
+  route: /chat
+  layout: full-width
+  auth: true
+
+data_requirements:
+  - resource: chat_rooms
+    needs: [id, created_at]
+
+  - resource: chat_participants
+    needs: [chat_room_id, user_id]
+
+  - resource: messages
+    needs: [id, chat_room_id, content, is_read, created_at, sender_id]
+
+  - resource: users
+    needs: [id, name, avatar_url]
+
+components:
+  - id: chat_room_list
+    type: list
+    position: main
+    function: 채팅방 목록 (상대방 이름, 마지막 메시지, 시간, 안 읽은 수)
+    data_source:
+      resource: chat_rooms
+    events:
+      - on: click:room
+        do: /chat/:id로 이동
+
+  - id: empty_state
+    type: text
+    position: main
+    function: 채팅 없을 때 안내 ("아직 대화가 없어요")
+
+connections:
+  navigations:
+    - from: chat_room_list
+      to: /chat/:id
+
+  shared_components:
+    - tab_bar
+
+  external:
+    - auth
+
+tests:
+  - name: 채팅 목록 표시
+    when: 채팅방이 있는 상태에서 접속
+    then: [채팅방 목록 표시, 마지막 메시지 표시, 안 읽은 배지 표시]
+
+  - name: 채팅방 진입
+    when: 채팅방 클릭
+    then: [/chat/:id로 이동]
+
+  - name: 빈 상태
+    when: 채팅방이 없는 상태에서 접속
+    then: [빈 상태 안내 표시]

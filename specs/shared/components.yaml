@@ -1,0 +1,72 @@
+# MentorHub 공통 컴포넌트
+version: "2.0"
+
+shared_components:
+  # 레이아웃
+  - id: tab_bar
+    type: navigation
+    position: footer
+    function: 하단 탭 네비게이션 (홈/검색/매칭/채팅/프로필)
+    used_in: [home, search, matching, chat-list, profile, category-detail]
+    tabs:
+      - { icon: Home, label: 홈, route: / }
+      - { icon: Search, label: 검색, route: /search }
+      - { icon: Sparkles, label: 매칭, route: /matching }
+      - { icon: MessageCircle, label: 채팅, route: /chat }
+      - { icon: User, label: 프로필, route: /profile }
+
+  - id: app_header
+    type: navigation
+    position: header
+    function: 앱 헤더 (로고, 알림 아이콘)
+    used_in: [home, category-detail, search, matching]
+
+  # 카드
+  - id: mentor_card
+    type: card
+    function: 멘토 카드 (이름, 사진, 스킬, 지역)
+    used_in: [home, category-detail, search, matching]
+    data_source:
+      resource: users
+    events:
+      - on: click
+        do: /mentoring/:id로 이동
+
+  - id: chat_room_card
+    type: card
+    function: 채팅방 카드 (상대방 이름, 마지막 메시지, 시간, 안읽은 수)
+    used_in: [chat-list]
+    data_source:
+      resource: chat_rooms
+
+  # 입력
+  - id: category_badge
+    type: card
+    function: 카테고리 태그/배지 (이름, 아이콘)
+    used_in: [home, onboarding, profile, profile-edit, search]
+    data_source:
+      resource: categories
+
+  # 피드백
+  - id: empty_state
+    type: text
+    function: 데이터 없을 때 안내 메시지
+    used_in: [matching, chat-list, search]
+
+  - id: login_modal
+    type: modal
+    function: 비로그인 상태에서 로그인 유도 모달
+    used_in: [mentoring-detail, matching]
+    events:
+      - on: click:login
+        do: /login으로 이동
+      - on: click:close
+        do: 모달 닫기
+
+  # 메시지
+  - id: message_bubble
+    type: card
+    function: 채팅 메시지 말풍선 (발신/수신 구분)
+    used_in: [chat-detail]
+    data_source:
+      resource: messages
